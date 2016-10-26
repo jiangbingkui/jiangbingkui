@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		.wrap{width:100%;overflow: hidden;}
+		.wrap header,.wrap footer{
+			width: 100%;
+			height:30px;
+			background:aqua;
+			color:#000;
+			text-align: center;
+			line-height: 30px;
+		}
+		.wrap footer{
+			position: fixed;
+			bottom: 0;
+			left:0;
+		}
+		.news{
+			width:400%;
+			overflow: hidden;
+		}
+		.news dl{
+			width:25%;
+			float: left;
+		}
+		.news dd{
+			width:100%;
+			line-height: 50px;
+			background: #ccc;
+			text-align: center;
+			
+		}
+		.news dt{
+			width:100%;
+			line-height: 50px;
+			border:1px dashed #333;
+			text-align: center;
+		}
+		.refresh{
+			text-align: center;
+			height:0;
+			overflow: hidden;
+		}
+	</style>
+	<script>
+		document.addEventListener('DOMContentLoaded',function(){
+			var oNews=document.querySelector('.news');
+			var aDl=document.querySelectorAll('.news dl');
+			var oRef=document.querySelector('.refresh');
+			var x=0;
+			var y=0;
+			var iNow=0;
+
+			oNews.addEventListener('touchstart',function(ev){
+				var downX=ev.targetTouches[0].pageX;
+				var downY=ev.targetTouches[0].pageY;
+				var disX=downX-x;
+				var disY=downY-y;
+
+				var dir='';
+				function fnMove(ev){
+
+					if(dir){
+						//有方向
+						if(dir=='lr'){	//判断方向 	上下？左右？
+							x=ev.targetTouches[0].pageX-disX;
+							oNews.style.transform='translate('+x+'px,'+y+'px)';
+						}else if(dir=='tb'){//上下
+							y=ev.targetTouches[0].pageY-disY;
+							y>80&&(y=80);
+							oRef.style.height=y+'px';
+						}
+					}else{//没方向	给dir重新赋值
+						if(Math.abs(ev.targetTouches[0].pageX-downX)>50){
+							dir='lr';
+						}else if(ev.targetTouches[0].pageY-disY>20){
+							dir='tb';
+						}
+					}
+					
+				}
+				function fnEnd(ev){
+					document.removeEventListener('touchmove',fnMove,false);
+					document.removeEventListener('touchend',fnEnd,false);
+
+					y=0;
+					oRef.style.height=0+'px';
+					oRef.style.WebkitTransition='0.4s all ease';
+
+					var upX=ev.changedTouches[0].pageX;
+					oNews.style.WebkitTransition='0.4s all ease';
+					//翻转
+					if(Math.abs(upX-downX)>50){
+						//向左走
+						if(downX>upX){
+							iNow++;
+					//走到右侧出去的第一张;so:aLi.length
+							if(iNow==aDl.length){iNow=aDl.length-1}
+							
+						}else{
+							iNow--;
+							if(iNow==-1){iNow=0}
+							
+						}
+
+					}
+					x=-aDl[0].offsetWidth*iNow;
+					oNews.style.WebkitTransform='translateX('+x+'px)';
+				}
+
+				document.addEventListener('touchmove',fnMove,false);
+				document.addEventListener('touchend',fnEnd,false);
+				ev.preventDefault();
+			},false);
+		},false);
+	</script>
+</head>
+<body>
+	<div class="wrap">
+		<header>header</header>
+		<section>
+			<div class="refresh">
+				<img src="roller.gif" alt=""><br>
+				<span>下拉刷新</span>	
+			</div>
+			<div class="news">
+					<dl>
+						<dd>标题1
+							<dt>0001</dt>
+							<dt>0002</dt>
+							<dt>0003</dt>
+							<dt>0004</dt>
+							<dt>0005</dt>
+							<dt>0006</dt>
+							<dt>0007</dt>
+							<dt>0008</dt>
+							<dt>0009</dt>
+							<dt>0010</dt>
+						</dd>
+					</dl>
+					<dl>
+						<dd>标题2
+							<dt>0001</dt>
+							<dt>0002</dt>
+							<dt>0003</dt>
+							<dt>0004</dt>
+							<dt>0005</dt>
+							<dt>0006</dt>
+							<dt>0007</dt>
+							<dt>0008</dt>
+							<dt>0009</dt>
+							<dt>0010</dt>
+						</dd>
+					</dl>
+					<dl>
+						<dd>标题3
+							<dt>0001</dt>
+							<dt>0002</dt>
+							<dt>0003</dt>
+							<dt>0004</dt>
+							<dt>0005</dt>
+							<dt>0006</dt>
+							<dt>0007</dt>
+							<dt>0008</dt>
+							<dt>0009</dt>
+							<dt>0010</dt>
+						</dd>
+					</dl>
+					<dl>
+						<dd>标题4
+							<dt>0001</dt>
+							<dt>0002</dt>
+							<dt>0003</dt>
+							<dt>0004</dt>
+							<dt>0005</dt>
+							<dt>0006</dt>
+							<dt>0007</dt>
+							<dt>0008</dt>
+							<dt>0009</dt>
+							<dt>0010</dt>
+						</dd>
+					</dl>
+				</div>	
+		</section>
+		<footer>footer</footer>
+	</div>
+</body>
+</html>
