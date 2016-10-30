@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		body{
+			background: #000;
+		}	
+		#c1{
+			background: #fff;
+		}
+	</style>
+	<script>
+		function d2a(n){
+			return n*Math.PI/180;
+		}
+		window.onload=function(){
+			var oC=document.getElementById('c1');
+			var gd=oC.getContext('2d');
+
+			var cx=200;
+			var cy=200;
+			function draw(start,end,r,color){
+
+				gd.lineWidth=20;
+				gd.beginPath();
+				gd.strokeStyle=color;
+				gd.arc(cx,cy,r,d2a(start),d2a(end),false);
+				gd.stroke();
+			}
+
+			draw(0,90,100,'orange');
+			draw(0,90,80,'blue');
+			draw(0,90,60,'pink');
+		};	
+	</script>
+</head>
+<body>
+	<canvas id="c1" width="800" height="600"></canvas>
+</body>
+</html>

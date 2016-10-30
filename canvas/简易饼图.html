@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	body{
+		background: #000;
+	}
+	#c1{
+		background: #fff;	
+	}
+	</style>
+	<script>
+		function rnd(m,n){
+			return Math.floor(Math.random()*(n-m)+m)
+		}
+		function d2a(n){
+			return n*Math.PI/180;
+		}
+		document.addEventListener('DOMContentLoaded',function(){
+			var oC=document.getElementById('c1');
+			var gd=oC.getContext('2d');
+
+			var arr=[30,80,170,50,260,666,22,546];
+			var sum=0;
+			for(var i=0;i<arr.length;i++){
+				sum+=arr[i];
+			}
+			var aDeg=[];
+			for(var i=0;i<arr.length;i++){
+				aDeg[i]=arr[i]*360/sum;
+			}
+			//套路
+			var cx=200;
+			var cy=200;
+			var r=100;
+			function draw(start,end){
+				gd.beginPath();
+				gd.moveTo(cx,cy);
+				gd.fillStyle='rgb('+rnd(0,256)+','+rnd(0,256)+','+rnd(0,256)+')';
+				gd.closePath();
+				gd.arc(cx,cy,r,d2a(start),d2a(end));
+				gd.fill();
+			}
+
+			var d=0;
+			for(var i=0;i<aDeg.length;i++){
+				draw(d,d+aDeg[i]);
+				d+=aDeg[i];
+			}
+
+		},false);	
+	</script>
+</head>
+<body>
+	<canvas id="c1" width="800" height="600"></canvas>
+</body>
+</html>
