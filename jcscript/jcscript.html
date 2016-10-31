@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		*{padding: 0;margin: 0;}
+		body{
+			background: #000;
+		}
+		#c1{
+			background: #fff;
+		}
+	</style>
+	<script src="jCanvaScript.1.5.18.min.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded',function(){
+			 //initialization by canvas id
+            jc.start('c1','abc');
+            //than we can draw some object
+            //(see 'objects' in the left navigation menu)
+            jc.circle(100,100,50,'rgba(255,0,0,0.5)',0).id('cir').click(function(){
+            	alert(1);
+            });
+            jc.text('世界杯',200,200).click(function(){
+                	jc('#cir').animate({x:300,radius:30,y:300},2000);
+                });
+            //we can create another object and use some function
+            //(see more in 'functions')
+            jc.rect(150,40,50,60,true)
+                .rotate(30,'center');
+            //and we need to redraw canvas in the end
+            jc.start('c1');
+		},false);		
+	</script>
+</head>
+<body>
+	<canvas id="c1" width="800" height="600"></canvas>
+</body>
+</html>
