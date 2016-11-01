@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		*{margin: 0;padding: 0;}
+		body{
+			background: #000;
+			text-align:center;
+		}	
+		#c1{
+			background:url('img/game_bg_2_hd.jpg');
+		}
+	</style>
+	<script src="js/com.js"></script>
+	<script src="js/resource.js"></script>
+	<script>
+		var FISH_SIZE=[
+			null,
+			{w: 55, h: 37, collR: 17},
+			{w: 78, h: 64, collR: 24},
+			{w: 72, h: 56, collR: 20},
+			{w: 77, h: 59, collR: 22},
+			{w: 107, h: 122, collR: 29}
+		];
+		function Fish(type){
+			this.type=type;
+			this.x=0;
+			this.y=0;
+			this.rotate=120;
+			this.cur=0;
+			this.iSpeed=1;
+			this.move();
+		}
+		Fish.prototype.draw=function(gd){
+
+			var w=FISH_SIZE[this.type].w;
+			var h=FISH_SIZE[this.type].h;
+			//gd.save();
+			gd.translate(this.x,this.y);
+			gd.rotate(d2a(this.rotate));
+			//gd.restore();
+			if(this.rotate>90&&this.rotate<270){
+				gd.scale(1,-1);
+			}
+			gd.drawImage(JSON['fish'+this.type],
+				0,this.cur*h,w,h,
+				-w/2,-h/2,w,h	
+			);
+		}
+		Fish.prototype.move=function(){
+			var _this=this;
+
+			setInterval(function(){
+				_this.x+=Math.cos(d2a(_this.rotate))*_this.iSpeed;
+				_this.y+=Math.sin(d2a(_this.rotate))*_this.iSpeed;
+			},16)
+
+			setInterval(function(){
+				_this.cur++;
+				if(_this.cur==4){
+					_this.cur=0;
+				}
+			},300)
+		}
+
+		document.addEventListener('DOMContentLoaded',function(){
+			var oC=document.getElementById('c1');
+			var gd=oC.getContext('2d');
+			
+
+			loadImage(resource,function(){
+				//gd.drawImage(JSON['fish4'],10,10);
+
+				var f1=new Fish(4);
+				f1.x=100;
+				f1.y=100;
+
+				setInterval(function(){
+					gd.clearRect(0,0,oC.width,oC.height);
+					gd.save();
+					f1.draw(gd);
+					gd.restore();
+				},16);
+				
+			});
+		},false);	
+	</script>
+</head>
+<body>
+	<canvas id="c1" width="800"  height="600"></canvas>
+</body>
+</html>
