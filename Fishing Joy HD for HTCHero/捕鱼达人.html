@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		*{margin: 0;padding: 0;}
+		html,body{
+			width: 100%;
+			height: 100%;
+		}
+		body{
+			background: #000;
+			text-align: center;
+		}
+		#c1{
+			background: url(img/game_bg_2_hd.jpg) no-repeat;
+		}
+	</style>
+	<script src="com.js"></script>
+	<script src="resource.js"></script> 
+	<script src="fish.js"></script>
+	<script src="cannon.js"></script>
+	<script src="bullet.js"></script>
+	<script src="web.js"></script>
+	<script src="coin.js"></script>
+	<script>
+		var FISH_SIZE=[
+			null,
+			{w: 55, h: 37, collR: 17},
+			{w: 78, h: 64, collR: 24},
+			{w: 72, h: 56, collR: 20},
+			{w: 77, h: 59, collR: 22},
+			{w: 107, h: 122, collR: 29}
+		];
+		function DieFish(type){
+			this.type=type;
+			this.x=0;
+			this.y=0;
+			this.rotate=0;
+			this.cur=0;
+			this.move();
+		}
+		DieFish.prototype.draw=function(gd){
+			var w=FISH_SIZE[this.type].w;
+			var h=FISH_SIZE[this.type].h;
+			gd.save();
+			gd.translate(this.x,this.y);
+			gd.rotate(d2a(this.rotate));
+			if(this.rotate>90&&this.rotate<270){
+				gd.scale(1,-1);
+			}
+			gd.drawImage(JSON['fish'+this.type],
+				0,h*(this.cur+4),w,h,
+				-w/2,-h/2,w,h
+			);
+			gd.restore();
+		};
+		DieFish.prototype.move=function(){
+			var _this=this;
+			
+			setInterval(function(){
+				_this.cur++;
+				if(_this.cur==4){
+					_this.cur=0;
+				}
+			},100);
+		};
+		window.onload=function(){
+			var oC=document.getElementById('c1');
+			var gd=oC.getContext('2d');
+			var out=50;
+			var direction=[out,-out];
+			var rule=0.05;
+			loadImg(resource,function(){
+				var can1=new Cannon(7);
+				var arrBullet=[];
+				var arrFish=[];
+				var arrCoin=[];
+				var arrWeb=[];
+				var arrDieFish=[];
+				setInterval(function(){
+					gd.clearRect(0,0,oC.width,oC.height);
+					gd.beginPath();
+					gd.drawImage(JSON['bottom'],
+						0,0,765,70,
+						0,oC.height-70,765,70
+					);
+					
+					for(var i=0;i<arrBullet.length;i++){
+						arrBullet[i].draw(gd);
+					}
+
+					for(var i=0;i<arrBullet.length;i++){
+						if(arrBullet[i].x<out || arrBullet[i].x>oC.width-out || arrBullet[i].y<out || arrBullet[i].y>oC.width-out){
+							arrBullet.splice(i,1);
+							i--;
+						}
+					}
+
+					can1.draw(gd);
+					if(Math.random()<rule){
+						direction.sort(function(){
+							return Math.random()-0.5;
+						});
+						if(direction[0]>0){
+							var f1=new Fish(rnd(1,6));
+							f1.x=-out;
+							f1.y=rnd(out,oC.height-out);
+							f1.rotate=rnd(-45,45);
+							arrFish.push(f1);
+						}else{
+							var f1=new Fish(rnd(1,6));
+							f1.x=oC.width+out;
+							f1.y=rnd(out,oC.height-out);
+							f1.rotate=rnd(135,225);
+							arrFish.push(f1);
+						}
+						
+					}
+					
+					//画鱼
+					for(var i=0;i<arrFish.length;i++){
+						arrFish[i].draw(gd);
+					}
+					//画死鱼
+					for(var i=0;i<arrDieFish.length;i++){
+						arrDieFish[i].draw(gd);
+
+					}
+					//画网
+					for(var i=0;i<arrCoin.length;i++){
+						arrCoin[i].draw(gd);
+						
+					}
+					//画网
+					for(var i=0;i<arrWeb.length;i++){
+						arrWeb[i].draw(gd);
+						arrWeb[i].scale+=0.02;
+						if(Math.round(arrWeb[i].scale*10)==12){
+							arrWeb.splice(i,1);
+							i--;
+						}
+					}
+					for(var i=0;i<arrFish.length;i++){
+						if(arrFish[i].x<-out || arrFish[i].x>oC.width+out || arrFish[i].y<-out || arrFish[i].y>oC.width+out){
+							arrFish.splice(i,1);
+							i--;
+						}
+					}
+					//循环所有的鱼和炮弹,判断当碰撞的情况;
+					for(var i=0;i<arrFish.length;i++){
+						for(var j=0;j<arrBullet.length;j++){
+							if(arrFish[i].isIn(arrBullet[j].x,arrBullet[j].y)){
+								var x=arrFish[i].x;
+								var y=arrFish[i].y;
+								var rotate=arrFish[i].rotate;
+								var type=arrFish[i].type;
+								arrFish.splice(i,1);//fish died
+								i--;
+								arrBullet.splice(j,1);//bullet died
+								j--;
+								var coin=new Coin(type);
+								coin.x=x;
+								coin.y=y;
+								arrCoin.push(coin);
+								var web=new Web();
+								web.x=x;
+								web.y=y;
+								arrWeb.push(web);
+								var dieFish=new DieFish(type);
+								dieFish.x=x;
+								dieFish.y=y;
+								dieFish.rotate=rotate;
+								arrDieFish.push(dieFish);
+								setTimeout(function(){
+									arrDieFish.shift();
+								},500);
+							}
+						}
+					}
+
+				},30);
+
+
+				oC.onclick=function(ev){
+					var x=ev.clientX-oC.offsetLeft-can1.x;
+					var y=can1.y-ev.clientY+oC.offsetTop;
+					var d=90-a2d(Math.atan2(y,x));
+					can1.rotate=d;
+					can1.emitChange();
+					var bullet=new Bullet(can1.type);
+					bullet.x=can1.x;
+					bullet.y=can1.y;
+					bullet.rotate=d;
+					arrBullet.push(bullet);
+				};
+			});
+		};
+	</script>
+</head>
+<body>
+	<canvas width="800" height="600" id="c1"></canvas>
+</body>
+</html>
